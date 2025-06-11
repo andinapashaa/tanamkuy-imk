@@ -18,6 +18,7 @@ export default function AuthForm({ type }) {
     if (res.ok) {
       const data = await res.json()
       localStorage.setItem('user', JSON.stringify(data.user || form))
+      document.cookie = `token=true; path=/`
       router.push('/dashboard')
     } else {
       alert('Gagal ' + type)
