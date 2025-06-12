@@ -8,8 +8,8 @@ export async function POST(req) {
     });
   }
 const dummyUser = {
-  email: 'andinapasha28@gmail.com',
-  password: 'andinacaca28',
+  email: 'chococaolate@gmail.com',
+  password: 'cokelatenak',
   name: 'Andina Pasha',
 };
 
