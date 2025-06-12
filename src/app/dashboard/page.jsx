@@ -9,21 +9,27 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('')
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'))
-    if (!user) {
-      router.push('/login') // Redirect kalau belum login
-    } else {
-      setUserName(user.name || 'User') // Tampilkan nama user
+  const selectedPlant = localStorage.getItem('tanaman')
+  if (selectedPlant) {
+    let img = ''
+    if (selectedPlant === 'Tomat') img = '/images/tomat.png'
+    else if (selectedPlant === 'Anggur') img = '/images/anggur.jpg'
+    else if (selectedPlant === 'Cabai') img = '/images/cabai.jpg'
+
+    const isAlreadyAdded = plants.some(plant => plant.name === selectedPlant)
+    if (!isAlreadyAdded) {
+      setPlants(prev => [...prev, { name: selectedPlant, img }])
     }
-  }, [])
+
+    localStorage.removeItem('tanaman') // Biar ga nambah terus tiap reload
+  }
+}, [plants])
+
 
   const handleAddPlant = () => {
-    const newPlant = {
-      name: plants.length === 0 ? 'Tomato' : 'Cabai',
-      img: plants.length === 0 ? '/images/tomato.jpg' : '/images/cabai.jpg',
-    }
-    setPlants([...plants, newPlant])
-  }
+  router.push('/tambah-tanaman')
+}
+
 
   return (
     <div className="min-h-screen bg-[#f1f4e8]">
