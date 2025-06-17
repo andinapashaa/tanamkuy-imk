@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 export default function TambahTanamanPage() {
   const router = useRouter()
 
-  const handleSelectPlant = (plant) => { // HAPUS ": string"
-    localStorage.setItem('tanaman', plant)
-    router.push('/') // Kembali ke dashboard setelah memilih tanaman
-  }
+  const handleSelectPlant = (plant) => {
+  localStorage.setItem('tanaman', plant.toLowerCase())
+  router.push(`/${plant.toLowerCase()}`)
+}
 
   return (
     <div className="min-h-screen bg-[#f1f4e8]">
@@ -18,7 +18,7 @@ export default function TambahTanamanPage() {
           <Image src="/images/logo-tanamkuy.png" alt="TanamKuy Logo" width={40} height={40} />
           <span className="text-sm font-medium text-gray-700">TanamKuy</span>
         </div>
-        <p className="text-sm text-gray-700">Hallo, <em>Henny</em></p>
+        <p className="text-sm text-gray-700">Hallo, <em>Selamat Datang</em></p>
       </div>
 
       {/* Konten Tambah Tanaman */}
