@@ -1,12 +1,13 @@
 'use client'
+
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 export default function TomatPage() {
   const router = useRouter()
 
-  const handleStartPlanting = () => {
-    router.push('/plant/tomat/step/1/') // Ini akan memanggil halaman 1.jsx
+  const handleStart = () => {
+    router.push('/plant/tomat/step/1') // navigasi ke halaman step 1
   }
 
   return (
@@ -44,8 +45,8 @@ export default function TomatPage() {
         </div>
 
         <button
+          onClick={handleStart}
           className="mt-8 bg-[#7d844d] text-white px-8 py-2 rounded-full hover:bg-[#6b753b] transition"
-          onClick={handleStartPlanting}
         >
           Mulai menanam !
         </button>

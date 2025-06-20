@@ -1,7 +1,15 @@
 'use client'
-import Image from 'next/image'
 
-export default function TomatPage() {
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+
+export default function CabaiStep() {
+  const router = useRouter()
+
+  const handleStart = () => {
+    router.push('/plant/cabai/step/1') // navigasi ke halaman step 1 anggur
+  }
+
   return (
     <div className="min-h-screen bg-[#f1f4e8] px-6">
       {/* Header */}
@@ -19,20 +27,23 @@ export default function TomatPage() {
       <div className="flex flex-col items-center mt-10 text-center">
         <Image
           src="/images/tomat.png" // Pastikan file ini ada di public/images
-          alt="Cabai"
+          alt="Anggur"
           width={400}
           height={250}
           className="rounded-xl"
         />
 
-        <h2 className="text-xl italic mt-4">CABAI</h2>
+        <h2 className="text-xl italic mt-4">ANGGUR</h2>
 
         <div className="bg-white rounded-2xl mt-4 px-6 py-4 max-w-2xl text-sm text-justify shadow">
-          Tomat adalah LOREM IPSUM
+          ANGGUR ITU ENAK BANG adalah LOREM IPSUM
           <span className="text-green-700 font-semibold ml-1 cursor-pointer">Read more</span>
         </div>
 
-        <button className="mt-8 bg-[#7d844d] text-white px-8 py-2 rounded-full hover:bg-[#6b753b] transition">
+        <button
+          onClick={handleStart}
+          className="mt-8 bg-[#7d844d] text-white px-8 py-2 rounded-full hover:bg-[#6b753b] transition"
+        >
           Mulai menanam !
         </button>
       </div>

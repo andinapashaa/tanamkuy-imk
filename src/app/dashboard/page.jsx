@@ -9,27 +9,29 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('')
 
   useEffect(() => {
-  const selectedPlant = localStorage.getItem('tanaman')
-  if (selectedPlant) {
-    let img = ''
-    if (selectedPlant === 'Tomat') img = '/images/tomat.png'
-    else if (selectedPlant === 'Anggur') img = '/images/anggur.jpg'
-    else if (selectedPlant === 'Cabai') img = '/images/cabai.jpg'
+    const selectedPlant = localStorage.getItem('tanaman')
+    if (selectedPlant) {
+      let img = ''
+      if (selectedPlant === 'Tomat') img = '/images/tomat.png'
+      else if (selectedPlant === 'Anggur') img = '/images/anggur.jpg'
+      else if (selectedPlant === 'Cabai') img = '/images/cabai.jpg'
 
-    const isAlreadyAdded = plants.some(plant => plant.name === selectedPlant)
-    if (!isAlreadyAdded) {
-      setPlants(prev => [...prev, { name: selectedPlant, img }])
+      const isAlreadyAdded = plants.some(plant => plant.name === selectedPlant)
+      if (!isAlreadyAdded) {
+        setPlants(prev => [...prev, { name: selectedPlant, img }])
+      }
+
+      localStorage.removeItem('tanaman') // Biar ga nambah terus tiap reload
     }
+  }, [plants])
 
-    localStorage.removeItem('tanaman') // Biar ga nambah terus tiap reload
+  const handleSelectPlant = (plant) => {
+    router.push('/plant/${plant.toLowerCase()}/step/1')
   }
-}, [plants])
-
 
   const handleAddPlant = () => {
-  router.push('/tambah-tanaman')
-}
-
+    router.push('/tambah-tanaman')
+  }
 
   return (
     <div className="min-h-screen bg-[#f1f4e8]">
@@ -53,7 +55,11 @@ export default function DashboardPage() {
 
         <div className="space-y-3">
           {plants.map((plant, index) => (
-            <div key={index} className="flex items-center bg-white shadow-sm rounded-md p-3">
+            <div
+              key={index}
+              className="flex items-center bg-white shadow-sm rounded-md p-3 cursor-pointer"
+              onClick={() => handleSelectPlant(plant.name)}
+            >
               <Image src={plant.img} alt={plant.name} width={50} height={50} className="rounded-md" />
               <span className="ml-4 text-gray-800">{plant.name}</span>
             </div>

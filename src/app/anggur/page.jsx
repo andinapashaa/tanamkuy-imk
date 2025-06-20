@@ -1,7 +1,15 @@
 'use client'
-import Image from 'next/image'
 
-export default function TomatPage() {
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+
+export default function AnggurStep() {
+  const router = useRouter()
+
+  const handleStart = () => {
+    router.push('/plant/anggur/step/1') // navigasi ke halaman step 1 anggur
+  }
+
   return (
     <div className="min-h-screen bg-[#f1f4e8] px-6">
       {/* Header */}
@@ -32,7 +40,10 @@ export default function TomatPage() {
           <span className="text-green-700 font-semibold ml-1 cursor-pointer">Read more</span>
         </div>
 
-        <button className="mt-8 bg-[#7d844d] text-white px-8 py-2 rounded-full hover:bg-[#6b753b] transition">
+        <button
+          onClick={handleStart}
+          className="mt-8 bg-[#7d844d] text-white px-8 py-2 rounded-full hover:bg-[#6b753b] transition"
+        >
           Mulai menanam !
         </button>
       </div>
