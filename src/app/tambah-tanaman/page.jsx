@@ -1,60 +1,75 @@
 'use client'
-import Image from 'next/image'
+
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function TambahTanamanPage() {
+  const [plantTypes, setPlantTypes] = useState([])
+  const [user, setUser] = useState(null)
   const router = useRouter()
 
-  const handleSelectPlant = (plant) => {
-  localStorage.setItem('tanaman', plant.toLowerCase())
-  router.push(`/${plant.toLowerCase()}`)
-}
+  useEffect(() => {
+    const stored = localStorage.getItem('user')
+    if (!stored) {
+      router.push('/login')
+    } else {
+      try {
+        setUser(JSON.parse(stored))
+      } catch {
+        localStorage.removeItem('user')
+        router.push('/login')
+      }
+    }
+
+    async function fetchPlants() {
+      const res = await fetch('/api/plant-type')
+      const data = await res.json()
+      setPlantTypes(data)
+    }
+
+    fetchPlants()
+  }, [router])
+
+  if (!user) return <p className="text-center mt-20">Loading...</p>
 
   return (
-    <div className="min-h-screen bg-[#f1f4e8]">
+    <div className="min-h-screen bg-[#f9fce6] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-[#e1e4b5]">
-        <div className="flex items-center space-x-2">
-          <Image src="/images/logo-tanamkuy.png" alt="TanamKuy Logo" width={40} height={40} />
-          <span className="text-sm font-medium text-gray-700">TanamKuy</span>
+      <div className="flex justify-between items-center bg-[#eef1c9] px-6" style={{ height: '60px' }}>
+        <div className="h-full">
+          <img src="/images/logo-tanamkuy.png" alt="logo" className="h-full object-contain" />
         </div>
-        <p className="text-sm text-gray-700">Hallo, <em>Selamat Datang</em></p>
+        <div className="text-right">
+          <p className="text-xl text-[#2e2b1b]">
+            Hallo,{' '}
+            <em className="text-[#5b6739] font-semibold">
+              {user?.name || 'Pengguna'}
+            </em>{' '}
+          </p>
+        </div>
       </div>
 
-      {/* Konten Tambah Tanaman */}
-      <div className="flex flex-col items-center mt-10">
-        <h1 className="text-xl italic mb-6">Tambah Tanaman</h1>
+      {/* Konten */}
+      <div className="p-6">
+        <h1 className="text-xl italic mb-6 text-left text-[#2f271b]">Tambah Tanaman</h1>
 
-        <div className="bg-[#9da978] p-6 rounded-3xl">
-          <p className="text-white text-lg italic text-center mb-4">Tambah Tanamanmu Sendiri</p>
-
-          <div className="grid grid-cols-3 gap-4">
-            {/* Tomat */}
-            <div
-              onClick={() => handleSelectPlant('Tomat')}
-              className="bg-[#e6ebbc] rounded-xl p-4 flex flex-col items-center cursor-pointer hover:shadow-md"
-            >
-              <Image src="/images/tomat.png" alt="Tomat" width={60} height={60} />
-              <p className="mt-2 text-[#6d7a45] italic">Tomat</p>
-            </div>
-
-            {/* Anggur */}
-            <div
-              onClick={() => handleSelectPlant('Anggur')}
-              className="bg-[#eac89f] rounded-xl p-4 flex flex-col items-center cursor-pointer hover:shadow-md"
-            >
-              <Image src="/images/anggur.jpg" alt="Anggur" width={60} height={60} />
-              <p className="mt-2 text-[#6d7a45] italic">Anggur</p>
-            </div>
-
-            {/* Cabai */}
-            <div
-              onClick={() => handleSelectPlant('Cabai')}
-              className="bg-[#eac89f] rounded-xl p-4 flex flex-col items-center cursor-pointer hover:shadow-md"
-            >
-              <Image src="/images/cabai.jpg" alt="Cabai" width={60} height={60} />
-              <p className="mt-2 text-[#6d7a45] italic">Cabai</p>
-            </div>
+        <div className="bg-[#AAB07B] p-8 rounded-[50px] max-w-xl mx-auto">
+          <p className="text-white italic text-xl mb-6 text-center">Tambah Tanamanmu Sendiri</p>
+          <div className="flex justify-center gap-4 flex-wrap">
+            {plantTypes.map((plant) => (
+              <div
+                key={plant.id}
+                onClick={() => router.push(`/plant/${plant.name.toLowerCase()}`)}
+                className="bg-[#f3f4cf] rounded-xl p-4 w-28 cursor-pointer hover:scale-105 transition duration-200 text-center"
+              >
+                <img
+                  src={plant.image}
+                  alt={plant.name}
+                  className="mx-auto h-14 mb-2 object-contain"
+                />
+                <p className="italic text-[#747B44] text-sm">{plant.name}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

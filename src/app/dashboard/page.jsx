@@ -1,80 +1,119 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 
-export default function DashboardPage() {
-  const router = useRouter()
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+export default function Dashboard() {
+  const [user, setUser] = useState(null)
   const [plants, setPlants] = useState([])
-  const [userName, setUserName] = useState('')
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    const selectedPlant = localStorage.getItem('tanaman')
-    if (selectedPlant) {
-      let img = ''
-      if (selectedPlant === 'Tomat') img = '/images/tomat.png'
-      else if (selectedPlant === 'Anggur') img = '/images/anggur.jpg'
-      else if (selectedPlant === 'Cabai') img = '/images/cabai.jpg'
+    const stored = localStorage.getItem('user')
+    if (!stored) {
+      router.push('/login')
+    } else {
+      try {
+        const parsed = JSON.parse(stored)
+        setUser(parsed)
 
-      const isAlreadyAdded = plants.some(plant => plant.name === selectedPlant)
-      if (!isAlreadyAdded) {
-        setPlants(prev => [...prev, { name: selectedPlant, img }])
+        fetch(`/api/my-plants?userId=${parsed.id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setPlants(data)
+            setLoading(false)
+          })
+          .catch(() => setLoading(false))
+      } catch {
+        localStorage.removeItem('user')
+        router.push('/login')
       }
-
-      localStorage.removeItem('tanaman') // Biar ga nambah terus tiap reload
     }
-  }, [plants])
+  }, [router])
 
-  const handleSelectPlant = (plant) => {
-    router.push('/plant/${plant.toLowerCase()}/step/1')
+  // Fungsi ketika tanaman diklik
+  const handleClickPlant = (plantId) => {
+    const startDateStr = localStorage.getItem(`startDate-${plantId}`)
+    if (!startDateStr) {
+      alert('Tanaman belum dimulai')
+      return
+    }
+
+    const startDate = new Date(startDateStr)
+    const now = new Date()
+    const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24))
+    const today = diffDays + 1 // Hari ke-N
+
+    router.push(`/plant/${plantId}/step/${today}`)
   }
 
-  const handleAddPlant = () => {
-    router.push('/tambah-tanaman')
-  }
+  if (loading) return <p className="text-center mt-20">Loading dashboard...</p>
 
   return (
-    <div className="min-h-screen bg-[#f1f4e8]">
+    <div className="min-h-screen bg-[#f9fce6] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-[#e1e4b5]">
-        <div className="flex items-center space-x-2">
-          <Image src="/images/logo-tanamkuy.png" alt="TanamKuy Logo" width={40} height={40} />
-          <span className="text-sm font-medium text-gray-700">TanamKuy</span>
+      <div className="flex justify-between items-center bg-[#eef1c9] px-6" style={{ height: '60px' }}>
+        <div className="h-full">
+          <img src="/images/logo-tanamkuy.png" alt="logo" className="h-full object-contain" />
         </div>
-        <div className="flex items-center space-x-2">
-          <p className="text-sm text-gray-700">
-            Hallo, <span className="font-bold text-[#362b1f]">{userName}</span>
+        <div className="text-right">
+          <p className="text-xl text-[#2e2b1b]">
+            Hallo, <em className="text-[#5b6739] font-semibold">{user?.name || 'Pengguna'}</em>
           </p>
-          <span className="text-xl">👤</span>
         </div>
       </div>
 
-      {/* Konten Utama */}
-      <div className="px-6 py-6">
-        <h1 className="text-xl font-semibold mb-4">Your Plant</h1>
-
-        <div className="space-y-3">
-          {plants.map((plant, index) => (
-            <div
-              key={index}
-              className="flex items-center bg-white shadow-sm rounded-md p-3 cursor-pointer"
-              onClick={() => handleSelectPlant(plant.name)}
-            >
-              <Image src={plant.img} alt={plant.name} width={50} height={50} className="rounded-md" />
-              <span className="ml-4 text-gray-800">{plant.name}</span>
+      {/* Daftar tanaman */}
+      <div className="flex-1 p-6">
+        {plants.length > 0 ? (
+          <div>
+            <h2 className="text-2xl font-bold mb-4 text-black">Tumbuhanmu</h2>
+            <div className="space-y-4">
+              {plants.map((plant) => (
+                <div
+                  key={plant.id}
+                  onClick={() => handleClickPlant(plant.id)}
+                  className="flex items-center bg-white rounded-xl p-4 shadow cursor-pointer hover:bg-[#f1f1f1] transition"
+                >
+                  <img
+                    src={plant.image}
+                    alt={plant.name}
+                    className="h-12 w-12 mr-4"
+                  />
+                  <span className="text-lg text-black">{plant.name}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <p className="text-gray-500 italic text-center mt-10">
+            Kamu belum menanam apa pun.
+          </p>
+        )}
+      </div>
 
-        {/* Tombol Tambah */}
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={handleAddPlant}
-            className="bg-[#7d844d] hover:bg-[#6a7340] text-white px-6 py-2 rounded-full"
-          >
-            Add my plant
-          </button>
-        </div>
+      {/* Tombol Add My Plant */}
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={() => router.push('/tambah-tanaman')}
+          className="bg-[#717b4a] text-white px-6 py-3 rounded-full"
+        >
+          Tambah tanaman
+        </button>
+      </div>
+
+      {/* Tombol Logout */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => {
+            localStorage.removeItem('user')
+            router.push('/')
+          }}
+          className="text-sm text-red-600 underline"
+        >
+          Logout
+        </button>
       </div>
     </div>
   )

@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  plants   Plant[]
+}
+
+model Plant {
+  id             String           @id @default(uuid())
+  name           String
+  description    String
+  image          String
+  userId         String
+  typeId         String
+  createdAt      DateTime         @default(now())
+
+  type           PlantType        @relation(fields: [typeId], references: [id])
+  user           User             @relation(fields: [userId], references: [id])
+  progress       PlantProgress[]
+  photoProgress  PhotoProgress[]  // ✅ Tambahkan relasi balik ke PhotoProgress
+}
+
+model PlantType {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  image       String
+  description String
+  steps       Json?
+  plants      Plant[]
+}
+
+model PlantProgress {
+  id        String   @id @default(uuid())
+  plantId   String
+  day       Int
+  note      String?
+  photo     String?
+  createdAt DateTime @default(now())
+
+  plant     Plant    @relation(fields: [plantId], references: [id])
+}
+
+model PhotoProgress {
+  id        String   @id @default(uuid())
+  plantId   String
+  day       Int
+  imageUrl  String
+  createdAt DateTime @default(now())
+
+  plant     Plant    @relation(fields: [plantId], references: [id])
+
+  @@unique([plantId, day])
+}
